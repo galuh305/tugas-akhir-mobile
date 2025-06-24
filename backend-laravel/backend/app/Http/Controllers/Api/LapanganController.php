@@ -24,8 +24,12 @@ class LapanganController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string',
             'tipe' => 'required|in:karpet,biasa',
+            'harga' => 'nullable|integer',
             'aktif' => 'boolean',
         ]);
+        if (!isset($validated['harga'])) {
+            $validated['harga'] = $validated['tipe'] === 'karpet' ? 50000 : 40000;
+        }
         $lapangan = Lapangan::create($validated);
         return response()->json($lapangan, 201);
     }
@@ -48,8 +52,12 @@ class LapanganController extends Controller
         $validated = $request->validate([
             'nama' => 'sometimes|string',
             'tipe' => 'sometimes|in:karpet,biasa',
+            'harga' => 'nullable|integer',
             'aktif' => 'sometimes|boolean',
         ]);
+        if (!isset($validated['harga'])) {
+            $validated['harga'] = isset($validated['tipe']) ? ($validated['tipe'] === 'karpet' ? 50000 : 40000) : $lapangan->harga;
+        }
         $lapangan->update($validated);
         return response()->json($lapangan);
     }

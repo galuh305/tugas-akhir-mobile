@@ -8,6 +8,6 @@ class Lapangan extends Model
 {
     protected $table = 'lapangans';
     protected $fillable = [
-        'nama', 'tipe', 'aktif'
+        'nama', 'tipe', 'aktif', 'harga'
     ];
 }

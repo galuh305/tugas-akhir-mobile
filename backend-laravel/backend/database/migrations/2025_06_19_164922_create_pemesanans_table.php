@@ -19,6 +19,8 @@ return new class extends Migration
             $table->time('jam_mulai'); // Jam mulai booking
             $table->time('jam_selesai');
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('confirmed');
+            $table->integer('harga')->nullable();
+            $table->integer('total_harga')->nullable();
             $table->timestamps();
         });
     }

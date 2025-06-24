@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama'); // Nama lapangan, contoh: Karpet 1
             $table->enum('tipe', ['karpet', 'biasa']);
+            $table->integer('harga')->nullable();
             $table->boolean('aktif')->default(true);
             $table->timestamps();
         });

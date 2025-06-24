@@ -29,7 +29,27 @@ class PemesananController extends Controller
             'jam_selesai' => 'required',
             'status' => 'in:pending,confirmed,cancelled',
         ]);
-        $pemesanan = Pemesanan::create($validated);
+        $exists = \App\Models\Pemesanan::where('lapangan_id', $validated['lapangan_id'])
+            ->where('tanggal', $validated['tanggal'])
+            ->where('status', 'confirmed')
+            ->where(function($q) use ($validated) {
+                $q->whereBetween('jam_mulai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                  ->orWhereBetween('jam_selesai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                  ->orWhere(function($q2) use ($validated) {
+                      $q2->where('jam_mulai', '<', $validated['jam_mulai'])
+                         ->where('jam_selesai', '>', $validated['jam_selesai']);
+                  });
+            })->exists();
+        if ($exists) {
+            return response()->json(['message' => 'Lapangan sudah terbooking silahkan pilih jam lain'], 422);
+        }
+        $lapangan = \App\Models\Lapangan::findOrFail($validated['lapangan_id']);
+        $validated['harga'] = $lapangan->harga;
+        $start = strtotime($validated['jam_mulai']);
+        $end = strtotime($validated['jam_selesai']);
+        $durasi = ($end - $start) / 3600;
+        $validated['total_harga'] = $lapangan->harga * $durasi;
+        $pemesanan = \App\Models\Pemesanan::create($validated);
         return response()->json($pemesanan, 201);
     }
 
@@ -47,7 +67,7 @@ class PemesananController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $pemesanan = Pemesanan::findOrFail($id);
+        $pemesanan = \App\Models\Pemesanan::findOrFail($id);
         $validated = $request->validate([
             'user_id' => 'sometimes|exists:users,id',
             'lapangan_id' => 'sometimes|exists:lapangans,id',
@@ -56,6 +76,31 @@ class PemesananController extends Controller
             'jam_selesai' => 'sometimes',
             'status' => 'sometimes|in:pending,confirmed,cancelled',
         ]);
+        $lapangan_id = $validated['lapangan_id'] ?? $pemesanan->lapangan_id;
+        $tanggal = $validated['tanggal'] ?? $pemesanan->tanggal;
+        $jam_mulai = $validated['jam_mulai'] ?? $pemesanan->jam_mulai;
+        $jam_selesai = $validated['jam_selesai'] ?? $pemesanan->jam_selesai;
+        $exists = \App\Models\Pemesanan::where('lapangan_id', $lapangan_id)
+            ->where('tanggal', $tanggal)
+            ->where('status', 'confirmed')
+            ->where('id', '!=', $id)
+            ->where(function($q) use ($jam_mulai, $jam_selesai) {
+                $q->whereBetween('jam_mulai', [$jam_mulai, $jam_selesai])
+                  ->orWhereBetween('jam_selesai', [$jam_mulai, $jam_selesai])
+                  ->orWhere(function($q2) use ($jam_mulai, $jam_selesai) {
+                      $q2->where('jam_mulai', '<', $jam_mulai)
+                         ->where('jam_selesai', '>', $jam_selesai);
+                  });
+            })->exists();
+        if ($exists) {
+            return response()->json(['message' => 'Lapangan sudah terbooking silahkan pilih jam lain'], 422);
+        }
+        $lapangan = \App\Models\Lapangan::findOrFail($lapangan_id);
+        $validated['harga'] = $lapangan->harga;
+        $start = strtotime($jam_mulai);
+        $end = strtotime($jam_selesai);
+        $durasi = ($end - $start) / 3600;
+        $validated['total_harga'] = $lapangan->harga * $durasi;
         $pemesanan->update($validated);
         return response()->json($pemesanan);
     }
