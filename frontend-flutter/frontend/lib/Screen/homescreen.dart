@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'lapanganscreen.dart';
+import '../Servis/Apiservis.dart';
+import '../Model/lapanganmodel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,6 +13,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String selectedType = 'all';
+  late Future<List<Lapangan>> futureLapangan;
+
+  @override
+  void initState() {
+    super.initState();
+    futureLapangan = fetchLapangan();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +191,64 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  child: LapanganScreen(filterTipe: selectedType),
+                  child: Column(
+                    children: [
+                      // Venue Populer
+                      FutureBuilder<List<Lapangan>>(
+                        future: futureLapangan,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Gagal memuat venue'));
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Center(child: Text('Tidak ada venue'));
+                          }
+                          final populer = snapshot.data!.take(3).toList();
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
+                                child: Text('Venue Populer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                              ),
+                              SizedBox(
+                                height: 120,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: populer.length,
+                                  itemBuilder: (context, i) {
+                                    final lap = populer[i];
+                                    return Container(
+                                      width: 180,
+                                      margin: EdgeInsets.symmetric(horizontal: 8),
+                                      padding: EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF43CEA2).withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(lap.nama, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                          SizedBox(height: 4),
+                                          Text('Jenis: ${lap.jenis}', style: TextStyle(fontSize: 13)),
+                                          SizedBox(height: 4),
+                                          Text('Harga: Rp${lap.harga}', style: TextStyle(fontSize: 13)),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      // Daftar lengkap lapangan
+                      Expanded(child: LapanganScreen(filterTipe: selectedType)),
+                    ],
+                  ),
                 ),
               ),
             ),

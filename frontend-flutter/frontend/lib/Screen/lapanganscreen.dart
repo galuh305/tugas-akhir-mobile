@@ -20,10 +20,10 @@ class _LapanganScreenState extends State<LapanganScreen> {
     futureLapangan = fetchLapangan();
   }
 
-  IconData _getIcon(String tipe) {
-    if (tipe.toLowerCase().contains('karpet')) {
+  IconData _getIcon(String jenis) {
+    if (jenis.toLowerCase().contains('badminton')) {
       return Icons.sports_tennis;
-    } else if (tipe.toLowerCase().contains('rumput')) {
+    } else if (jenis.toLowerCase().contains('futsal')) {
       return Icons.sports_soccer;
     }
     return Icons.sports;
@@ -39,9 +39,9 @@ class _LapanganScreenState extends State<LapanganScreen> {
           if (widget.filterTipe != 'all') {
             data = data.where((e) {
               if (widget.filterTipe == 'badminton') {
-                return e.tipe.toLowerCase() == 'karpet';
+                return e.jenis.toLowerCase() == 'badminton';
               } else if (widget.filterTipe == 'futsal') {
-                return e.tipe.toLowerCase() == 'rumput';
+                return e.jenis.toLowerCase() == 'futsal';
               }
               return true;
             }).toList();
@@ -73,7 +73,7 @@ class _LapanganScreenState extends State<LapanganScreen> {
                           ),
                           padding: const EdgeInsets.all(16),
                           child: Icon(
-                            _getIcon(lapangan.tipe),
+                            _getIcon(lapangan.jenis),
                             size: 36,
                             color: const Color(0xFF185A9D),
                           ),
@@ -119,6 +119,17 @@ class _LapanganScreenState extends State<LapanganScreen> {
                                 ],
                               ),
                               const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(Icons.category, size: 18, color: const Color(0xFF185A9D)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    "Jenis: ${lapangan.jenis}",
+                                    style: GoogleFonts.poppins(fontSize: 15, color: const Color(0xFF185A9D)),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
                               Row(
                                 children: [
                                   Icon(Icons.category, size: 18, color: const Color(0xFF185A9D)),
