@@ -9,6 +9,10 @@
             <input type="text" name="nama" class="form-control" required>
         </div>
         <div class="form-group">
+            <label>Jenis</label>
+            <input type="text" name="jenis" class="form-control" required>
+        </div>
+        <div class="form-group">
             <label>Tipe</label>
             <select name="tipe" class="form-control" required>
                 <option value="karpet">Karpet</option>

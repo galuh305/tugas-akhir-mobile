@@ -33,6 +33,7 @@ class PemesananController extends Controller
             'jam_mulai' => 'required',
             'jam_selesai' => 'required',
             'status' => 'in:pending,confirmed,cancelled',
+            'bukti_tf' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         // Validasi booking bentrok
         $exists = \App\Models\Pemesanan::where('lapangan_id', $validated['lapangan_id'])
@@ -55,6 +56,12 @@ class PemesananController extends Controller
         $end = strtotime($validated['jam_selesai']);
         $durasi = ($end - $start) / 3600;
         $validated['total_harga'] = $lapangan->harga * $durasi;
+        if ($request->hasFile('bukti_tf')) {
+            $file = $request->file('bukti_tf');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/bukti_tf'), $filename);
+            $validated['bukti_tf'] = 'uploads/bukti_tf/'.$filename;
+        }
         \App\Models\Pemesanan::create($validated);
         return redirect()->route('pemesanans.index')->with('success', 'Pemesanan berhasil ditambahkan');
     }
@@ -75,6 +82,7 @@ class PemesananController extends Controller
             'jam_mulai' => 'sometimes',
             'jam_selesai' => 'sometimes',
             'status' => 'sometimes|in:pending,confirmed,cancelled',
+            'bukti_tf' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         // Validasi booking bentrok
         $lapangan_id = $validated['lapangan_id'] ?? $pemesanan->lapangan_id;
@@ -102,6 +110,12 @@ class PemesananController extends Controller
         $end = strtotime($jam_selesai);
         $durasi = ($end - $start) / 3600;
         $validated['total_harga'] = $lapangan->harga * $durasi;
+        if ($request->hasFile('bukti_tf')) {
+            $file = $request->file('bukti_tf');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/bukti_tf'), $filename);
+            $validated['bukti_tf'] = 'uploads/bukti_tf/'.$filename;
+        }
         $pemesanan->update($validated);
         return redirect()->route('pemesanans.index')->with('success', 'Pemesanan berhasil diupdate');
     }

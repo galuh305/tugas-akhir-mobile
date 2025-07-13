@@ -8,6 +8,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nama</th>
+                <th>Jenis lapangan</th>
                 <th>Tipe</th>
                 <th>Harga</th>
                 <th>Aktif</th>
@@ -19,6 +20,7 @@
             <tr>
                 <td>{{ $lapangan->id }}</td>
                 <td>{{ $lapangan->nama }}</td>
+                <td>{{ $lapangan->jenis }}</td>
                 <td>{{ $lapangan->tipe }}</td>
                 <td>{{ $lapangan->harga ? 'Rp. ' . number_format($lapangan->harga, 0, ',', '.') : 'Otomatis' }}</td>
                 <td>{{ $lapangan->aktif ? 'Ya' : 'Tidak' }}</td>

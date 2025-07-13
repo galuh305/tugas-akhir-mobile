@@ -2,7 +2,7 @@
 @section('content')
 <div class="container">
     <h1>Edit Pemesanan</h1>
-    <form action="{{ route('pemesanans.update', $pemesanan->id) }}" method="POST">
+    <form action="{{ route('pemesanans.update', $pemesanan->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="form-group">
@@ -40,6 +40,13 @@
         <div class="form-group">
             <label>Total Harga</label>
             <input type="number" class="form-control" value="{{ $pemesanan->total_harga ?? '-' }}" readonly>
+        </div>
+        <div class="form-group">
+            <label>Bukti Transfer (gambar)</label>
+            <input type="file" name="bukti_tf" class="form-control-file" accept="image/*">
+            @if($pemesanan->bukti_tf)
+                <br><img src="/{{ $pemesanan->bukti_tf }}" alt="Bukti Transfer" style="max-width:200px;max-height:200px;">
+            @endif
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>

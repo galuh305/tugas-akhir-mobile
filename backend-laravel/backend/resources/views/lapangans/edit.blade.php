@@ -10,6 +10,10 @@
             <input type="text" name="nama" class="form-control" value="{{ $lapangan->nama }}" required>
         </div>
         <div class="form-group">
+            <label>Jenis</label>
+            <input type="text" name="jenis" class="form-control" value="{{ $lapangan->jenis }}" required>
+        </div>
+        <div class="form-group">
             <label>Tipe</label>
             <select name="tipe" class="form-control" required>
                 <option value="karpet" {{ $lapangan->tipe == 'karpet' ? 'selected' : '' }}>Karpet</option>

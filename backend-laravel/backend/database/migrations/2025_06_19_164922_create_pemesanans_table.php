@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('confirmed');
             $table->integer('harga')->nullable();
             $table->integer('total_harga')->nullable();
+            $table->string('bukti_tf')->nullable(); // Tambahan keterangan jika diperlukan
             $table->timestamps();
         });
     }

@@ -23,6 +23,7 @@ class LapanganController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string',
+            'jenis' => 'required|string',
             'tipe' => 'required|in:karpet,biasa',
             'harga' => 'nullable|integer',
             'aktif' => 'boolean',
@@ -51,6 +52,7 @@ class LapanganController extends Controller
         $lapangan = Lapangan::findOrFail($id);
         $validated = $request->validate([
             'nama' => 'sometimes|string',
+            'jenis' => 'required|string',
             'tipe' => 'sometimes|in:karpet,biasa',
             'harga' => 'nullable|integer',
             'aktif' => 'sometimes|boolean',

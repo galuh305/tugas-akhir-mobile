@@ -7,7 +7,7 @@
             {{ $errors->first() }}
         </div>
     @endif
-    <form action="{{ route('pemesanans.store') }}" method="POST">
+    <form action="{{ route('pemesanans.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-group">
             <label>User</label>
@@ -59,6 +59,10 @@
         <div class="form-group">
             <label>Total Harga</label>
             <input type="number" id="total_harga" name="total_harga" class="form-control" value="" readonly>
+        </div>
+        <div class="form-group">
+            <label>Bukti Transfer (gambar)</label>
+            <input type="file" name="bukti_tf" class="form-control-file" accept="image/*">
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
     </form>

@@ -28,6 +28,7 @@ class LapanganController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string',
+            'jenis' => 'required|string',
             'tipe' => 'required|in:karpet,biasa',
             'harga' => 'nullable|integer',
             'aktif' => 'boolean',
@@ -35,21 +36,22 @@ class LapanganController extends Controller
         if (!isset($validated['harga'])) {
             $validated['harga'] = $validated['tipe'] === 'karpet' ? 50000 : 40000;
         }
-        Lapangan::create($validated);
+        \App\Models\Lapangan::create($validated);
         return redirect()->route('lapangans.index')->with('success', 'Lapangan berhasil ditambahkan');
     }
 
     public function edit($id)
     {
-        $lapangan = Lapangan::findOrFail($id);
+        $lapangan = \App\Models\Lapangan::findOrFail($id);
         return view('lapangans.edit', compact('lapangan'));
     }
 
     public function update(Request $request, $id)
     {
-        $lapangan = Lapangan::findOrFail($id);
+        $lapangan = \App\Models\Lapangan::findOrFail($id);
         $validated = $request->validate([
             'nama' => 'sometimes|string',
+            'jenis' => 'sometimes|string',
             'tipe' => 'sometimes|in:karpet,biasa',
             'harga' => 'nullable|integer',
             'aktif' => 'sometimes|boolean',

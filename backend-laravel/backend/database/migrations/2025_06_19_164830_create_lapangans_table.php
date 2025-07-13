@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('lapangans', function (Blueprint $table) {
             $table->id();
             $table->string('nama'); // Nama lapangan, contoh: Karpet 1
+            $table->string('jenis'); 
             $table->enum('tipe', ['karpet', 'biasa']);
             $table->integer('harga')->nullable();
             $table->boolean('aktif')->default(true);

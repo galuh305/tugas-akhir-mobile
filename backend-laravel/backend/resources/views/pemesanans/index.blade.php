@@ -15,6 +15,7 @@
                 <th>Status</th>
                 <th>Harga</th>
                 <th>Total Harga</th>
+                <th>Bukti TF</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -30,6 +31,13 @@
                 <td>{{ $pemesanan->status }}</td>
                 <td>{{ $pemesanan->harga ? 'Rp. ' . number_format($pemesanan->harga, 0, ',', '.') : '-' }}</td>
                 <td>{{ $pemesanan->total_harga ? 'Rp. ' . number_format($pemesanan->total_harga, 0, ',', '.') : '-' }}</td>
+                <td>
+                    @if($pemesanan->bukti_tf)
+                        <img src="/{{ $pemesanan->bukti_tf }}" alt="Bukti TF" style="max-width:80px;max-height:80px;">
+                    @else
+                        -
+                    @endif
+                </td>
                 <td>
                     <a href="{{ route('pemesanans.show', $pemesanan->id) }}" class="btn btn-info btn-sm">Detail</a>
                     <a href="{{ route('pemesanans.edit', $pemesanan->id) }}" class="btn btn-warning btn-sm">Edit</a>

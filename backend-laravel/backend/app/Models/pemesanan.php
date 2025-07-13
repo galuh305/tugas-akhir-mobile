@@ -8,7 +8,7 @@ class Pemesanan extends Model
 {
     protected $table = 'pemesanans';
     protected $fillable = [
-        'user_id', 'lapangan_id', 'tanggal', 'jam_mulai', 'jam_selesai', 'status', 'harga', 'total_harga'
+        'user_id', 'lapangan_id', 'tanggal', 'jam_mulai', 'jam_selesai', 'status', 'harga', 'total_harga', 'bukti_tf'
     ];
 
     public function user()
