@@ -7,6 +7,7 @@ import '../Servis/Apiservis.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'payment_screen.dart';
+import 'payment_qr_screen.dart';
 
 class BookingScreen extends StatefulWidget {
   final int lapanganId;
@@ -86,11 +87,14 @@ class _BookingScreenState extends State<BookingScreen> {
     print('Booking ID: $bookingId');
     setState(() => _loading = false);
     if (bookingId != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Booking berhasil! Silakan upload bukti transfer.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Booking berhasil! Silakan lakukan pembayaran.')));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => PaymentScreen(bookingId: bookingId),
+          builder: (context) => PaymentQRScreen(
+            totalHarga: _totalHarga,
+            bookingId: bookingId,
+          ),
         ),
       );
     } else {
@@ -148,21 +152,6 @@ class _BookingScreenState extends State<BookingScreen> {
               Text('Harga: Rp${widget.harga}', style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               Text('Total Harga: Rp$_totalHarga', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              SizedBox(height: 24),
-              Text('Upload Bukti Transfer (opsional):'),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _pickBuktiTf,
-                    icon: Icon(Icons.upload_file),
-                    label: Text('Pilih File'),
-                  ),
-                  SizedBox(width: 12),
-                  if (_buktiTfFile != null)
-                    Expanded(child: Text(_buktiTfFile!.path.split('/').last)),
-                ],
-              ),
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loading ? null : _submit,

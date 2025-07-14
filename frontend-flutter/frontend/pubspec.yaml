@@ -39,6 +39,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   image_picker: ^1.0.7
   dio: ^5.4.0
+  qr_flutter: ^4.1.0
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +64,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/qr_dana.png
+
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
