@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/bookingmodel.dart';
 import '../Servis/Apiservis.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'payment_screen.dart';
 
 class BookingScreen extends StatefulWidget {
-  final int userId;
   final int lapanganId;
   final int harga;
-  const BookingScreen({Key? key, required this.userId, required this.lapanganId, required this.harga}) : super(key: key);
+  const BookingScreen({Key? key, required this.lapanganId, required this.harga}) : super(key: key);
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -19,30 +23,78 @@ class _BookingScreenState extends State<BookingScreen> {
   TimeOfDay? _jamMulai;
   TimeOfDay? _jamSelesai;
   bool _loading = false;
+  int? userId;
+  File? _buktiTfFile;
+
+  int get _totalHarga {
+    if (_jamMulai == null || _jamSelesai == null) return widget.harga;
+    final mulai = _jamMulai!;
+    final selesai = _jamSelesai!;
+    int durasi = (selesai.hour * 60 + selesai.minute) - (mulai.hour * 60 + mulai.minute);
+    if (durasi <= 0) durasi = 60; // minimal 1 jam
+    final jam = (durasi / 60).ceil();
+    return widget.harga * jam;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userStr = prefs.getString('user');
+    if (userStr != null) {
+      setState(() {
+        userId = json.decode(userStr)['id'];
+      });
+    }
+  }
+
+  Future<void> _pickBuktiTf() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _buktiTfFile = File(picked.path);
+      });
+    }
+  }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate() || _tanggal == null || _jamMulai == null || _jamSelesai == null) return;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('User belum login!')));
+      return;
+    }
     setState(() => _loading = true);
     final booking = Booking(
       id: 0,
-      userId: widget.userId,
+      userId: userId!,
       lapanganId: widget.lapanganId,
       tanggal: DateFormat('yyyy-MM-dd').format(_tanggal!),
-      jamMulai: _jamMulai!.format(context),
-      jamSelesai: _jamSelesai!.format(context),
+      jamMulai: _formatTimeOfDay(_jamMulai!),
+      jamSelesai: _formatTimeOfDay(_jamSelesai!),
       status: 'pending',
       harga: widget.harga,
-      totalHarga: widget.harga, // bisa dikalkulasi sesuai durasi
+      totalHarga: _totalHarga,
       buktiTf: null,
       createdAt: null,
       updatedAt: null,
     );
-    final success = await createBooking(booking);
+    final bookingId = await createBooking(booking);
+    print('Booking ID: $bookingId');
     setState(() => _loading = false);
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Booking berhasil!')));
-      Navigator.pop(context);
+    if (bookingId != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Booking berhasil! Silakan upload bukti transfer.')));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentScreen(bookingId: bookingId),
+        ),
+      );
     } else {
+      print('Booking gagal, cek response backend!');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Booking gagal!')));
     }
   }
@@ -94,6 +146,23 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
               SizedBox(height: 16),
               Text('Harga: Rp${widget.harga}', style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              Text('Total Harga: Rp$_totalHarga', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              SizedBox(height: 24),
+              Text('Upload Bukti Transfer (opsional):'),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _pickBuktiTf,
+                    icon: Icon(Icons.upload_file),
+                    label: Text('Pilih File'),
+                  ),
+                  SizedBox(width: 12),
+                  if (_buktiTfFile != null)
+                    Expanded(child: Text(_buktiTfFile!.path.split('/').last)),
+                ],
+              ),
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loading ? null : _submit,
@@ -105,4 +174,10 @@ class _BookingScreenState extends State<BookingScreen> {
       ),
     );
   }
+}
+
+String _formatTimeOfDay(TimeOfDay tod) {
+  final now = DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+  return DateFormat('HH:mm:ss').format(dt);
 } 
