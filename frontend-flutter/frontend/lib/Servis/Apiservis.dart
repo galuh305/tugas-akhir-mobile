@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dio/dio.dart';
 
 Future<List<Lapangan>> fetchLapangan() async {
-  final response = await http.get(Uri.parse('http://192.168.1.11:8000/api/lapangans'));
+  final response = await http.get(Uri.parse('http://10.152.133.163:8000/api/lapangans'));
   print('Status: ${response.statusCode}');
   print('Body: ${response.body}');
   if (response.statusCode == 200) {
@@ -20,7 +20,7 @@ Future<List<Lapangan>> fetchLapangan() async {
 
 Future<int?> createBooking(Booking booking) async {
   try {
-    var uri = Uri.parse('http://192.168.1.11:8000/api/pemesanans');
+    var uri = Uri.parse('http://10.152.133.163:8000/api/pemesanans');
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['user_id'] = booking.userId.toString();
@@ -61,7 +61,7 @@ Future<int?> createBooking(Booking booking) async {
 }
 
 Future<bool> updateBuktiTf(int bookingId, dynamic file) async {
-  final url = 'http://192.168.1.11:8000/api/pemesanans/$bookingId';
+  final url = 'http://10.152.133.163:8000/api/pemesanans/$bookingId';
   final dio = Dio();
   FormData formData;
   if (kIsWeb) {

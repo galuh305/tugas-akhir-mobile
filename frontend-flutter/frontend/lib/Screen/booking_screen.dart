@@ -6,7 +6,6 @@ import '../Model/bookingmodel.dart';
 import '../Servis/Apiservis.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'payment_screen.dart';
 import 'payment_qr_screen.dart';
 
 class BookingScreen extends StatefulWidget {
@@ -25,7 +24,6 @@ class _BookingScreenState extends State<BookingScreen> {
   TimeOfDay? _jamSelesai;
   bool _loading = false;
   int? userId;
-  File? _buktiTfFile;
 
   int get _totalHarga {
     if (_jamMulai == null || _jamSelesai == null) return widget.harga;
@@ -49,15 +47,6 @@ class _BookingScreenState extends State<BookingScreen> {
     if (userStr != null) {
       setState(() {
         userId = json.decode(userStr)['id'];
-      });
-    }
-  }
-
-  Future<void> _pickBuktiTf() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _buktiTfFile = File(picked.path);
       });
     }
   }
@@ -106,58 +95,88 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Booking Lapangan')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              ListTile(
-                title: Text(_tanggal == null ? 'Pilih Tanggal' : DateFormat('dd MMM yyyy').format(_tanggal!)),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 365)),
-                  );
-                  if (picked != null) setState(() => _tanggal = picked);
-                },
+      appBar: AppBar(
+        title: Text('Booking Lapangan', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Color(0xFF185A9D),
+        elevation: 0,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            margin: EdgeInsets.all(18),
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Form Booking', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF185A9D))),
+                    SizedBox(height: 24),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(_tanggal == null ? 'Pilih Tanggal' : DateFormat('dd MMM yyyy').format(_tanggal!), style: TextStyle(fontSize: 16)),
+                      trailing: Icon(Icons.calendar_today, color: Color(0xFF185A9D)),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(Duration(days: 365)),
+                        );
+                        if (picked != null) setState(() => _tanggal = picked);
+                      },
+                    ),
+                    Divider(),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(_jamMulai == null ? 'Pilih Jam Mulai' : _jamMulai!.format(context), style: TextStyle(fontSize: 16)),
+                      trailing: Icon(Icons.access_time, color: Color(0xFF185A9D)),
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (picked != null) setState(() => _jamMulai = picked);
+                      },
+                    ),
+                    Divider(),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(_jamSelesai == null ? 'Pilih Jam Selesai' : _jamSelesai!.format(context), style: TextStyle(fontSize: 16)),
+                      trailing: Icon(Icons.access_time, color: Color(0xFF185A9D)),
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (picked != null) setState(() => _jamSelesai = picked);
+                      },
+                    ),
+                    Divider(),
+                    SizedBox(height: 16),
+                    Text('Harga: Rp${widget.harga}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 8),
+                    Text('Total Harga: Rp$_totalHarga', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF185A9D))),
+                    SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: _loading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF185A9D),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      child: _loading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text('Booking'),
+                    ),
+                  ],
+                ),
               ),
-              ListTile(
-                title: Text(_jamMulai == null ? 'Pilih Jam Mulai' : _jamMulai!.format(context)),
-                trailing: Icon(Icons.access_time),
-                onTap: () async {
-                  final picked = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (picked != null) setState(() => _jamMulai = picked);
-                },
-              ),
-              ListTile(
-                title: Text(_jamSelesai == null ? 'Pilih Jam Selesai' : _jamSelesai!.format(context)),
-                trailing: Icon(Icons.access_time),
-                onTap: () async {
-                  final picked = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (picked != null) setState(() => _jamSelesai = picked);
-                },
-              ),
-              SizedBox(height: 16),
-              Text('Harga: Rp${widget.harga}', style: TextStyle(fontSize: 16)),
-              SizedBox(height: 8),
-              Text('Total Harga: Rp$_totalHarga', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _loading ? null : _submit,
-                child: _loading ? CircularProgressIndicator(color: Colors.white) : Text('Booking'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
