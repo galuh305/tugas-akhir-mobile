@@ -126,4 +126,15 @@ class PemesananController extends Controller
         $pemesanan->delete();
         return redirect()->route('pemesanans.index')->with('success', 'Pemesanan berhasil dihapus');
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $pemesanan = \App\Models\Pemesanan::findOrFail($id);
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled',
+        ]);
+        $pemesanan->status = $request->status;
+        $pemesanan->save();
+        return redirect()->route('pemesanans.index')->with('success', 'Status pemesanan berhasil diubah');
+    }
 }

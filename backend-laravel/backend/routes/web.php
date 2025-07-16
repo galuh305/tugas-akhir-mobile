@@ -22,3 +22,4 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [\App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
 Route::get('/dashboard/statistik', [\App\Http\Controllers\HomeController::class, 'statistik']);
 Route::get('/dashboard/events', [\App\Http\Controllers\HomeController::class, 'events']);
+Route::post('pemesanans/{id}/update-status', [\App\Http\Controllers\PemesananController::class, 'updateStatus'])->name('pemesanans.updateStatus');

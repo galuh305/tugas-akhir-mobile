@@ -20,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     setState(() { _loading = true; _error = null; });
     final response = await http.post(
-      Uri.parse('http://10.176.85.163:8000/api/login'),
+      Uri.parse('http://192.168.126.183/tugas-akhir-mobile/backend-laravel/backend/public/api/login'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'email': _emailController.text,

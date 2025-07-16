@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dio/dio.dart';
 
-const String baseUrl = 'http://10.176.85.163:8000/api';
+const String baseUrl = 'http://192.168.126.183/tugas-akhir-mobile/backend-laravel/backend/public/api';
 
 Future<List<Lapangan>> fetchLapangan() async {
   final response = await http.get(Uri.parse('$baseUrl/lapangans'));

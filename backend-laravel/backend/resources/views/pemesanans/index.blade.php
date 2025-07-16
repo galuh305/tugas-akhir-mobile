@@ -39,8 +39,20 @@
                     @endif
                 </td>
                 <td>
+                    @if($pemesanan->status == 'pending')
+                        <form action="{{ route('pemesanans.updateStatus', $pemesanan->id) }}" method="POST" style="display:inline-block">
+                            @csrf
+                            <input type="hidden" name="status" value="confirmed">
+                            <button type="submit" class="btn btn-success btn-sm">Konfirmasi</button>
+                        </form>
+                    @elseif($pemesanan->status == 'confirmed')
+                        <form action="{{ route('pemesanans.updateStatus', $pemesanan->id) }}" method="POST" style="display:inline-block">
+                            @csrf
+                            <input type="hidden" name="status" value="cancelled">
+                            <button type="submit" class="btn btn-danger btn-sm">Batalkan</button>
+                        </form>
+                    @endif
                     <a href="{{ route('pemesanans.show', $pemesanan->id) }}" class="btn btn-info btn-sm">Detail</a>
-                    <a href="{{ route('pemesanans.edit', $pemesanan->id) }}" class="btn btn-warning btn-sm">Edit</a>
                     <form action="{{ route('pemesanans.destroy', $pemesanan->id) }}" method="POST" style="display:inline-block">
                         @csrf
                         @method('DELETE')
