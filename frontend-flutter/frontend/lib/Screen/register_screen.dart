@@ -20,7 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     setState(() { _loading = true; _error = null; });
     final response = await http.post(
-      Uri.parse('http://10.152.133.163:8000/api/register'),
+      Uri.parse('http://10.176.85.163:8000/api/register'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'email': _emailController.text,
@@ -40,50 +40,80 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (v) => v == null || v.isEmpty ? 'Email wajib diisi' : null,
+      backgroundColor: Color(0xFFE0F7FA),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            margin: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            child: Padding(
+              padding: const EdgeInsets.all(28.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Register', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF185A9D)), textAlign: TextAlign.center),
+                    SizedBox(height: 32),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email, color: Color(0xFF185A9D)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      validator: (v) => v == null || v.isEmpty ? 'Email wajib diisi' : null,
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: Icon(Icons.lock, color: Color(0xFF185A9D)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      obscureText: true,
+                      validator: (v) => v == null || v.isEmpty ? 'Password wajib diisi' : null,
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _passwordConfController,
+                      decoration: InputDecoration(
+                        labelText: 'Konfirmasi Password',
+                        prefixIcon: Icon(Icons.lock_outline, color: Color(0xFF185A9D)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      obscureText: true,
+                      validator: (v) => v != _passwordController.text ? 'Konfirmasi password tidak sama' : null,
+                    ),
+                    SizedBox(height: 28),
+                    if (_error != null) ...[
+                      Text(_error!, style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                      SizedBox(height: 12),
+                    ],
+                    ElevatedButton(
+                      onPressed: _loading ? null : () {
+                        if (_formKey.currentState!.validate()) _register();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF185A9D),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      child: _loading ? CircularProgressIndicator(color: Colors.white) : Text('Daftar', style: TextStyle(color: Colors.white)),
+                    ),
+                    SizedBox(height: 18),
+                    TextButton(
+                      onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                      child: Text('Sudah punya akun? Login', style: TextStyle(color: Color(0xFF185A9D), fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (v) => v == null || v.isEmpty ? 'Password wajib diisi' : null,
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordConfController,
-                decoration: InputDecoration(labelText: 'Konfirmasi Password'),
-                obscureText: true,
-                validator: (v) => v != _passwordController.text ? 'Konfirmasi password tidak sama' : null,
-              ),
-              SizedBox(height: 24),
-              if (_error != null) ...[
-                Text(_error!, style: TextStyle(color: Colors.red)),
-                SizedBox(height: 12),
-              ],
-              ElevatedButton(
-                onPressed: _loading ? null : () {
-                  if (_formKey.currentState!.validate()) _register();
-                },
-                child: _loading ? CircularProgressIndicator(color: Colors.white) : Text('Daftar'),
-              ),
-              SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
-                child: Text('Sudah punya akun? Login'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

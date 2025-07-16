@@ -78,11 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Hi, ${userName.isNotEmpty ? userName : 'User'} 👋',
+                              'Hi,  ${userName.isNotEmpty ? userName : 'User'} 👋',
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                             SizedBox(height: 4),
@@ -90,16 +90,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               'Welcome Hi-Sport',
                               style: GoogleFonts.poppins(
                                 color: Colors.white70,
-                                fontSize: 14,
+                                fontSize: 15,
                               ),
                             ),
                           ],
                         ),
                       ),
                       CircleAvatar(
-                        radius: 24,
+                        radius: 28,
                         backgroundColor: Colors.white,
-                        child: Icon(Icons.person, color: Color(0xFF185A9D), size: 28),
+                        child: Icon(Icons.person, color: Color(0xFF185A9D), size: 32),
                       ),
                     ],
                   ),
@@ -109,17 +109,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: TextField(
                       onChanged: (val) {
                         setState(() {
                           searchKeyword = val;
                         });
-                        print('Search: $val');
                       },
                       decoration: InputDecoration(
-                        hintText: 'Search',
-                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Cari venue...'
+                            ,
+                        prefixIcon: Icon(Icons.search, color: Color(0xFF185A9D)),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),
@@ -147,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(builder: (context) => LapanganScreen()),
                       );
                     },
-                    child: Text('View all'),
+                    child: Text('View all', style: TextStyle(color: Color(0xFF185A9D), fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -156,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // Kategori Venue
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Kategori Venue', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text('Kategori Venue', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF185A9D))),
             ),
             SizedBox(
               height: 100,
@@ -171,7 +178,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         selectedKategori = kategori['nama'];
                       });
-                      print('Kategori dipilih: ${kategori['nama']}');
                     },
                     child: Container(
                       margin: EdgeInsets.only(right: 16),
@@ -187,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           SizedBox(height: 12),
-                          Text(kategori['nama'], style: GoogleFonts.poppins(fontSize: 13)),
+                          Text(kategori['nama'], style: GoogleFonts.poppins(fontSize: 13, color: Color(0xFF185A9D))),
                         ],
                       ),
                     ),
@@ -198,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // Venue Populer
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Text('Venue Populer', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text('Venue Populer', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF185A9D))),
             ),
             FutureBuilder<List<Lapangan>>(
               future: futureLapangan,
@@ -219,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   populer = populer.where((lap) => lap.nama.toLowerCase().contains(searchKeyword.toLowerCase())).toList();
                 }
                 return SizedBox(
-                  height: 120,
+                  height: 140,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -228,26 +234,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       final lap = populer[i];
                       return GestureDetector(
                         onTap: () {
-                          print('Venue dipilih: ${lap.nama}');
                           // TODO: Navigasi ke halaman detail venue jika sudah ada
                         },
                         child: Container(
-                          width: 180,
-                          margin: EdgeInsets.only(right: 12),
-                          padding: EdgeInsets.all(12),
+                          width: 200,
+                          margin: EdgeInsets.only(right: 16),
+                          padding: EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Color(0xFF43CEA2).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(lap.nama, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15)),
+                              Text(lap.nama, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17, color: Color(0xFF185A9D))),
                               SizedBox(height: 4),
-                              Text('Jenis: ${lap.jenis}', style: GoogleFonts.poppins(fontSize: 12)),
+                              Text('Jenis: ${lap.jenis}', style: GoogleFonts.poppins(fontSize: 13)),
                               SizedBox(height: 4),
-                              Text('Harga: Rp${lap.harga}', style: GoogleFonts.poppins(fontSize: 12)),
+                              Text('Harga: Rp${lap.harga}', style: GoogleFonts.poppins(fontSize: 13)),
                             ],
                           ),
                         ),
@@ -270,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        child: Icon(Icons.add_shopping_cart),
+        child: Icon(Icons.add_shopping_cart, color: Colors.white),
         backgroundColor: Color(0xFF185A9D),
       ),
     );
@@ -282,7 +294,6 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           selectedTab = idx;
         });
-        print('Tab dipilih: $label');
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

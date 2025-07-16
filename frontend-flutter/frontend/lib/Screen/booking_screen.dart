@@ -167,11 +167,11 @@ class _BookingScreenState extends State<BookingScreen> {
                         backgroundColor: Color(0xFF185A9D),
                         padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       child: _loading
                           ? CircularProgressIndicator(color: Colors.white)
-                          : Text('Booking'),
+                          : Text('Booking', style: TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),
