@@ -27,3 +27,5 @@ Route::post('pemesanans/{id}/update-status', [\App\Http\Controllers\PemesananCon
 
 Route::get('/laporan/mingguan', [LaporanController::class, 'laporanMingguan'])->name('laporan.mingguan');
 Route::get('/laporan/bulanan', [LaporanController::class, 'laporanBulanan'])->name('laporan.bulanan');
+Route::get('/laporan/mingguan/pdf', [LaporanController::class, 'cetakMingguan'])->name('laporan.mingguan.pdf');
+Route::get('/laporan/bulanan/pdf', [LaporanController::class, 'cetakBulanan'])->name('laporan.bulanan.pdf');

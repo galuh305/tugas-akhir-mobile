@@ -13,11 +13,12 @@
     </form>
 
     @php
-        $selectedMonth = request('month') ? \Carbon\Carbon::parse(request('month')) : null;
+        $startOfMonth = request('month') ? \Carbon\Carbon::parse(request('month'))->startOfMonth() : null;
+        $endOfMonth = request('month') ? \Carbon\Carbon::parse(request('month'))->endOfMonth() : null;
     @endphp
 
-    @if($selectedMonth)
-        <p>Showing results for {{ $selectedMonth->format('F Y') }}</p>
+    @if($startOfMonth && $endOfMonth)
+        <p>Showing results for {{ $startOfMonth->format('F Y') }}</p>
     @endif
 
     <table class="table">
@@ -30,6 +31,7 @@
                 <th>Jam Mulai</th>
                 <th>Jam Selesai</th>
                 <th>Status</th>
+                <th>Harga</th>
             </tr>
         </thead>
         <tbody>
@@ -42,9 +44,12 @@
                 <td>{{ $item->jam_mulai }}</td>
                 <td>{{ $item->jam_selesai }}</td>
                 <td>{{ $item->status }}</td>
+                <td>{{ $item->harga }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
+
+    <a href="{{ route('laporan.bulanan.pdf', ['month' => request('month')]) }}" class="btn btn-danger">Cetak PDF</a>
 </div>
 @endsection

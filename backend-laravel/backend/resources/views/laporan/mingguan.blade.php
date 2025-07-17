@@ -31,6 +31,7 @@
                 <th>Jam Mulai</th>
                 <th>Jam Selesai</th>
                 <th>Status</th>
+                <th>Harga</th>
             </tr>
         </thead>
         <tbody>
@@ -43,9 +44,12 @@
                 <td>{{ $item->jam_mulai }}</td>
                 <td>{{ $item->jam_selesai }}</td>
                 <td>{{ $item->status }}</td>
+                <td>{{ $item->harga }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
+
+    <a href="{{ route('laporan.mingguan.pdf', ['date' => request('date')]) }}" class="btn btn-danger">Cetak PDF</a>
 </div>
 @endsection
