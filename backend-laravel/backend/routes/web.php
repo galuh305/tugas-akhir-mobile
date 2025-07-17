@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LapanganController;
 use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LaporanController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -23,3 +24,6 @@ Route::get('/dashboard', [\App\Http\Controllers\HomeController::class, 'dashboar
 Route::get('/dashboard/statistik', [\App\Http\Controllers\HomeController::class, 'statistik']);
 Route::get('/dashboard/events', [\App\Http\Controllers\HomeController::class, 'events']);
 Route::post('pemesanans/{id}/update-status', [\App\Http\Controllers\PemesananController::class, 'updateStatus'])->name('pemesanans.updateStatus');
+
+Route::get('/laporan/mingguan', [LaporanController::class, 'laporanMingguan'])->name('laporan.mingguan');
+Route::get('/laporan/bulanan', [LaporanController::class, 'laporanBulanan'])->name('laporan.bulanan');

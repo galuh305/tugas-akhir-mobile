@@ -64,6 +64,16 @@
           <i class="zmdi zmdi-calendar"></i> <span>Pemesanan</span>
         </a>
       </li>
+      <li>
+        <a href="{{ route('laporan.mingguan') }}">
+          <i class="zmdi zmdi-calendar-note"></i> <span>Laporan Mingguan</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ route('laporan.bulanan') }}">
+          <i class="zmdi zmdi-calendar"></i> <span>Laporan Bulanan</span>
+        </a>
+      </li>
 
       
 
