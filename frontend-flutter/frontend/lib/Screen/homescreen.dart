@@ -5,6 +5,7 @@ import '../Servis/Apiservis.dart';
 import '../Model/lapanganmodel.dart';
 import 'lapanganscreen.dart';
 import 'booking_screen.dart';
+import 'account_setting_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -100,6 +101,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         radius: 28,
                         backgroundColor: Colors.white,
                         child: Icon(Icons.person, color: Color(0xFF185A9D), size: 32),
+                      ),
+                      SizedBox(width: 8),
+                      IconButton(
+                        icon: Icon(Icons.settings, color: Colors.white),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AccountSettingScreen()),
+                          );
+                        },
                       ),
                     ],
                   ),

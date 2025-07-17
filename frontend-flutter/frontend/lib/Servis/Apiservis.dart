@@ -5,8 +5,9 @@ import '../Model/bookingmodel.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-const String baseUrl = 'http://192.168.126.183/tugas-akhir-mobile/backend-laravel/backend/public/api';
+const String baseUrl = 'http://192.168.1.18:8000/api'; // untuk emulator
 
 Future<List<Lapangan>> fetchLapangan() async {
   final response = await http.get(Uri.parse('$baseUrl/lapangans'));
@@ -90,5 +91,65 @@ Future<bool> updateBuktiTf(int bookingId, dynamic file) async {
   } catch (e) {
     print('Error upload: $e');
     return false;
+  }
+}
+
+Future<Map<String, dynamic>> updateProfileWithError(int userId, String name) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  final response = await http.put(
+    Uri.parse('$baseUrl/users/$userId'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: json.encode({'name': name}),
+  );
+  print('Update profile status: ${response.statusCode}');
+  print('Body: ${response.body}');
+  if (response.statusCode == 200 || response.statusCode == 202) {
+    return {'success': true};
+  } else {
+    String? msg;
+    try {
+      // Cek apakah response JSON
+      final data = json.decode(response.body);
+      msg = data['message'] ?? response.body;
+    } catch (e) {
+      // Jika bukan JSON, tampilkan langsung
+      msg = response.body;
+    }
+    return {'success': false, 'message': msg};
+  }
+}
+
+Future<Map<String, dynamic>> changePasswordWithError(String oldPassword, String newPassword, String confirmPassword) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  final response = await http.put(
+    Uri.parse('$baseUrl/password'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: json.encode({
+      'old_password': oldPassword,
+      'new_password': newPassword,
+      'new_password_confirmation': confirmPassword,
+    }),
+  );
+  print('Change password status: ${response.statusCode}');
+  print('Body: ${response.body}');
+  if (response.statusCode == 200 || response.statusCode == 202) {
+    return {'success': true};
+  } else {
+    String? msg;
+    try {
+      final data = json.decode(response.body);
+      msg = data['message'] ?? response.body;
+    } catch (e) {
+      msg = response.body;
+    }
+    return {'success': false, 'message': msg};
   }
 }
