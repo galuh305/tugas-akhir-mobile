@@ -6,6 +6,7 @@ import '../Model/lapanganmodel.dart';
 import 'lapanganscreen.dart';
 import 'booking_screen.dart';
 import 'account_setting_screen.dart';
+import '../Model/bookingmodel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,7 +17,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Lapangan>> futureLapangan;
+  Future<List<Booking>>? futureBooking;
   String userName = '';
+  int? userId;
   int selectedTab = 0;
   String searchKeyword = '';
   String selectedKategori = '';
@@ -26,6 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
     {"nama": "Basket", "icon": Icons.sports_basketball},
     {"nama": "Voli", "icon": Icons.sports_volleyball},
     {"nama": "Tenis", "icon": Icons.sports_tennis},
+  ];
+  final List<Map<String, String>> promoList = [
+    {"title": "Diskon 20% Booking Weekend!", "desc": "Booking lapangan di akhir pekan dapatkan diskon spesial."},
+    {"title": "Gratis 1 Jam", "desc": "Booking 3 jam, gratis 1 jam untuk semua venue."},
   ];
 
   @override
@@ -42,14 +49,21 @@ class _HomeScreenState extends State<HomeScreen> {
       final user = userStr.contains('{') ? userStr : '{}';
       setState(() {
         userName = (user != '{}') ? (user.contains('name') ? RegExp('"name":"([^"]+)"').firstMatch(user)?.group(1) ?? '' : '') : '';
+        userId = (user != '{}') ? (user.contains('id') ? int.tryParse(RegExp('"id":(\d+)').firstMatch(user)?.group(1) ?? '') : null) : null;
       });
+      if (userId != null) {
+        setState(() {
+          futureBooking = fetchBookingUser(userId!);
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -57,12 +71,18 @@ class _HomeScreenState extends State<HomeScreen> {
             // Header
             Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF43CEA2), Color(0xFF185A9D)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+              decoration: BoxDecoration(
+                gradient: isDark
+                  ? LinearGradient(
+                      colors: [Color(0xFF23272A), Color(0xFF181C1F)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : LinearGradient(
+                      colors: [Color(0xFF43CEA2), Color(0xFF185A9D)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
@@ -118,11 +138,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Search Bar
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? Color(0xFF23272A) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black12,
+                          color: isDark ? Colors.black26 : Colors.black12,
                           blurRadius: 6,
                           offset: Offset(0, 2),
                         ),
@@ -137,13 +157,56 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: InputDecoration(
                         hintText: 'Cari venue...'
                             ,
-                        prefixIcon: Icon(Icons.search, color: Color(0xFF185A9D)),
+                        prefixIcon: Icon(Icons.search, color: isDark ? Colors.white : Color(0xFF185A9D)),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        hintStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
                       ),
                     ),
                   ),
                 ],
+              ),
+            ),
+            // PROMO BANNER
+            SizedBox(height: 16),
+            SizedBox(
+              height: 110,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                itemCount: promoList.length,
+                separatorBuilder: (_, __) => SizedBox(width: 16),
+                itemBuilder: (context, i) {
+                  final promo = promoList[i];
+                  return Container(
+                    width: 270,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF43CEA2).withOpacity(0.85), Color(0xFF185A9D).withOpacity(0.85)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(promo['title']!, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        SizedBox(height: 8),
+                        Text(promo['desc']!, style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
             SizedBox(height: 18),
@@ -277,6 +340,39 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
+                );
+              },
+            ),
+            // RIWAYAT BOOKING
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Text('Riwayat Booking Terakhir', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF185A9D))),
+            ),
+            FutureBuilder<List<Booking>>(
+              future: futureBooking,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Gagal memuat riwayat booking'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('Belum ada riwayat booking'));
+                }
+                final bookings = snapshot.data!.take(3).toList();
+                return Column(
+                  children: bookings.map((b) => Card(
+                    margin: EdgeInsets.only(bottom: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 4,
+                    child: ListTile(
+                      leading: Icon(Icons.history, color: Color(0xFF185A9D)),
+                      title: Text('Booking Lapangan ID: ${b.lapanganId}', style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text('Tanggal: ${b.tanggal}\nJam: ${b.jamMulai} - ${b.jamSelesai}\nStatus: ${b.status}'),
+                      trailing: b.status == 'pending'
+                        ? Icon(Icons.timelapse, color: Colors.orange)
+                        : Icon(Icons.check_circle, color: Colors.green),
+                    ),
+                  )).toList(),
                 );
               },
             ),

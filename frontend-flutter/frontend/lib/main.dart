@@ -3,23 +3,66 @@ import 'Screen/login_screen.dart';
 import 'Screen/register_screen.dart';
 import 'Screen/homescreen.dart';
 import 'Screen/auth_wrapper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.light);
+
+Future<void> loadThemeMode() async {
+  final prefs = await SharedPreferences.getInstance();
+  final mode = prefs.getString('theme_mode');
+  if (mode == 'dark') themeModeNotifier.value = ThemeMode.dark;
+  else if (mode == 'light') themeModeNotifier.value = ThemeMode.light;
+}
+
+Future<void> saveThemeMode(ThemeMode mode) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('theme_mode', mode == ThemeMode.dark ? 'dark' : 'light');
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await loadThemeMode();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Hi-Sport',
-      debugShowCheckedModeBanner: false,
-      home: AuthWrapper(), // <-- gunakan ini!
-      routes: {
-        '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
-      },
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeModeNotifier,
+      builder: (context, mode, _) => MaterialApp(
+        title: 'Hi-Sport',
+        debugShowCheckedModeBanner: false,
+        themeMode: mode,
+        theme: ThemeData(
+          brightness: Brightness.light,
+          primaryColor: Color(0xFF185A9D),
+          scaffoldBackgroundColor: Color(0xFFE0F7FA),
+          colorScheme: ColorScheme.light(
+            primary: Color(0xFF185A9D),
+            secondary: Color(0xFF43CEA2),
+          ),
+        ),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          primaryColor: Color(0xFF185A9D),
+          scaffoldBackgroundColor: Color(0xFF181C1F),
+          colorScheme: ColorScheme.dark(
+            primary: Color(0xFF43CEA2),
+            secondary: Color(0xFF185A9D),
+            background: Color(0xFF181C1F),
+            surface: Color(0xFF23272A),
+          ),
+          cardColor: Color(0xFF23272A),
+          appBarTheme: AppBarTheme(backgroundColor: Color(0xFF23272A)),
+        ),
+        home: AuthWrapper(),
+        routes: {
+          '/login': (context) => LoginScreen(),
+          '/register': (context) => RegisterScreen(),
+          '/home': (context) => HomeScreen(),
+        },
+      ),
     );
   }
 }

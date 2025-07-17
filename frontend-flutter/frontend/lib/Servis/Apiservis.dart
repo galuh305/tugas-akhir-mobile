@@ -94,6 +94,16 @@ Future<bool> updateBuktiTf(int bookingId, dynamic file) async {
   }
 }
 
+Future<List<Booking>> fetchBookingUser(int userId) async {
+  final response = await http.get(Uri.parse('$baseUrl/pemesanans/user/$userId'));
+  if (response.statusCode == 200) {
+    List data = json.decode(response.body);
+    return data.map((e) => Booking.fromJson(e)).toList();
+  } else {
+    throw Exception('Gagal memuat riwayat booking');
+  }
+}
+
 Future<Map<String, dynamic>> updateProfileWithError(int userId, String name) async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
@@ -152,4 +162,19 @@ Future<Map<String, dynamic>> changePasswordWithError(String oldPassword, String 
     }
     return {'success': false, 'message': msg};
   }
+}
+
+Future<bool> cekKetersediaanLapangan(int lapanganId, String tanggal, String jamMulai, String jamSelesai) async {
+  final url = '$baseUrl/cek-ketersediaan?lapangan_id=$lapanganId&tanggal=$tanggal&jam_mulai=$jamMulai&jam_selesai=$jamSelesai';
+  try {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      // Asumsi response: {"tersedia": true/false}
+      return data['tersedia'] == true;
+    }
+  } catch (e) {
+    print('Error cek ketersediaan: $e');
+  }
+  return false;
 }

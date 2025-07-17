@@ -32,11 +32,12 @@ class _LapanganScreenState extends State<LapanganScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Color(0xFFE0F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text('Daftar Lapangan', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Color(0xFF185A9D),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor ?? (isDark ? Color(0xFF23272A) : Color(0xFF185A9D)),
         elevation: 0,
       ),
       body: FutureBuilder<List<Lapangan>>(
@@ -55,7 +56,7 @@ class _LapanganScreenState extends State<LapanganScreen> {
               }).toList();
             }
             if (data.isEmpty) {
-              return Center(child: Text('Tidak ada data lapangan untuk filter ini.', style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600])));
+              return Center(child: Text('Tidak ada data lapangan untuk filter ini.', style: GoogleFonts.poppins(fontSize: 16, color: isDark ? Colors.white70 : Colors.grey[600])));
             }
             return ListView.builder(
               itemCount: data.length,
@@ -80,7 +81,7 @@ class _LapanganScreenState extends State<LapanganScreen> {
                     child: Material(
                       elevation: 6,
                       borderRadius: BorderRadius.circular(18),
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       child: Padding(
                         padding: const EdgeInsets.all(18),
                         child: Row(
@@ -88,14 +89,14 @@ class _LapanganScreenState extends State<LapanganScreen> {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFF43CEA2).withOpacity(0.15),
+                                color: isDark ? Theme.of(context).colorScheme.primary.withOpacity(0.12) : const Color(0xFF43CEA2).withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               padding: const EdgeInsets.all(16),
                               child: Icon(
                                 _getIcon(lapangan.jenis),
                                 size: 36,
-                                color: const Color(0xFF185A9D),
+                                color: isDark ? Colors.white : const Color(0xFF185A9D),
                               ),
                             ),
                             const SizedBox(width: 18),
@@ -111,14 +112,14 @@ class _LapanganScreenState extends State<LapanganScreen> {
                                           style: GoogleFonts.poppins(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
-                                            color: const Color(0xFF185A9D),
+                                            color: isDark ? Colors.white : const Color(0xFF185A9D),
                                           ),
                                         ),
                                       ),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: lapangan.aktif == 1 ? const Color(0xFF43CEA2) : Colors.red,
+                                          color: lapangan.aktif == 1 ? (isDark ? Theme.of(context).colorScheme.primary : const Color(0xFF43CEA2)) : Colors.red,
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Row(
@@ -141,33 +142,33 @@ class _LapanganScreenState extends State<LapanganScreen> {
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      Icon(Icons.category, size: 18, color: const Color(0xFF185A9D)),
+                                      Icon(Icons.category, size: 18, color: isDark ? Colors.white : const Color(0xFF185A9D)),
                                       const SizedBox(width: 6),
                                       Text(
                                         "Jenis: ${lapangan.jenis}",
-                                        style: GoogleFonts.poppins(fontSize: 15, color: const Color(0xFF185A9D)),
+                                        style: GoogleFonts.poppins(fontSize: 15, color: isDark ? Colors.white : const Color(0xFF185A9D)),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      Icon(Icons.category, size: 18, color: const Color(0xFF185A9D)),
+                                      Icon(Icons.category, size: 18, color: isDark ? Colors.white : const Color(0xFF185A9D)),
                                       const SizedBox(width: 6),
                                       Text(
                                         "Tipe: ${lapangan.tipe}",
-                                        style: GoogleFonts.poppins(fontSize: 15, color: const Color(0xFF185A9D)),
+                                        style: GoogleFonts.poppins(fontSize: 15, color: isDark ? Colors.white : const Color(0xFF185A9D)),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      Icon(Icons.attach_money, size: 18, color: const Color(0xFF185A9D)),
+                                      Icon(Icons.attach_money, size: 18, color: isDark ? Colors.white : const Color(0xFF185A9D)),
                                       const SizedBox(width: 6),
                                       Text(
                                         "Harga: Rp${lapangan.harga}",
-                                        style: GoogleFonts.poppins(fontSize: 15, color: const Color(0xFF185A9D)),
+                                        style: GoogleFonts.poppins(fontSize: 15, color: isDark ? Colors.white : const Color(0xFF185A9D)),
                                       ),
                                     ],
                                   ),
