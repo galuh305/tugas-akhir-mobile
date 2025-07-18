@@ -25,3 +25,5 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::apiResource('users', UserController::class);
 Route::apiResource('lapangans', LapanganController::class);
 Route::apiResource('pemesanans', PemesananController::class);
+Route::get('/cek-ketersediaan', [PemesananController::class, 'cekKetersediaan']);
+Route::get('/riwayat-transaksi', [PemesananController::class, 'riwayatTransaksi'])->middleware('auth:sanctum');

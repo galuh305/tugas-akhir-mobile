@@ -128,4 +128,31 @@ class PemesananController extends Controller
         $pemesanan->delete();
         return response()->json(['message' => 'Pemesanan deleted']);
     }
+
+    /**
+     * Check availability of the resource.
+     */
+    public function cekKetersediaan(Request $request)
+    {
+        $ada = \App\Models\Pemesanan::where('lapangan_id', $request->lapangan_id)
+            ->where('tanggal', $request->tanggal)
+            ->where(function($q) use ($request) {
+                $q->where('jam_mulai', '<', $request->jam_selesai)
+                  ->where('jam_selesai', '>', $request->jam_mulai);
+            })
+            ->exists();
+
+        return response()->json(['tersedia' => !$ada]);
+    }
+
+    /**
+     * Display a listing of the user's transaction history.
+     */
+    public function riwayatTransaksi(Request $request)
+    {
+        $user = $request->user();
+        $transaksi = \App\Models\Pemesanan::where('user_id', $user->id)->get();
+
+        return response()->json($transaksi);
+    }
 }
