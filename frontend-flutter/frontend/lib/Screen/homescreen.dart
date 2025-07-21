@@ -6,6 +6,7 @@ import '../Model/lapanganmodel.dart';
 import 'lapanganscreen.dart';
 import 'booking_screen.dart';
 import 'account_setting_screen.dart';
+import 'riwayat_transaksi_screen.dart';
 import '../Model/bookingmodel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Lapangan>> futureLapangan;
-  Future<List<Booking>>? futureBooking;
+  Future<List<Booking>>? futureRiwayatTransaksi;
   String userName = '';
   int? userId;
   int selectedTab = 0;
@@ -51,11 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
         userName = (user != '{}') ? (user.contains('name') ? RegExp('"name":"([^"]+)"').firstMatch(user)?.group(1) ?? '' : '') : '';
         userId = (user != '{}') ? (user.contains('id') ? int.tryParse(RegExp('"id":(\d+)').firstMatch(user)?.group(1) ?? '') : null) : null;
       });
-      if (userId != null) {
-        setState(() {
-          futureBooking = fetchBookingUser(userId!);
-        });
-      }
+      // Panggil riwayat transaksi
+      setState(() {
+        futureRiwayatTransaksi = fetchRiwayatTransaksiUser2();
+      });
     }
   }
 
@@ -117,10 +117,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.person, color: Color(0xFF185A9D), size: 32),
+                      IconButton(
+                        icon: Icon(Icons.receipt_long, color: Colors.white, size: 32),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => RiwayatTransaksiScreen()),
+                          );
+                        },
+                        tooltip: 'Riwayat Transaksi',
                       ),
                       SizedBox(width: 8),
                       IconButton(
@@ -343,36 +348,87 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
-            // RIWAYAT BOOKING
+            // RIWAYAT TRANSAKSI
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Text('Riwayat Booking Terakhir', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF185A9D))),
+              child: Text('Riwayat Transaksi Terakhir', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF185A9D))),
             ),
             FutureBuilder<List<Booking>>(
-              future: futureBooking,
+              future: futureRiwayatTransaksi,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Gagal memuat riwayat booking'));
+                  return Center(child: Text('Gagal memuat riwayat transaksi'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('Belum ada riwayat booking'));
+                  return Center(child: Text('Belum ada riwayat transaksi'));
                 }
-                final bookings = snapshot.data!.take(3).toList();
-                return Column(
-                  children: bookings.map((b) => Card(
-                    margin: EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 4,
-                    child: ListTile(
-                      leading: Icon(Icons.history, color: Color(0xFF185A9D)),
-                      title: Text('Booking Lapangan ID: ${b.lapanganId}', style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text('Tanggal: ${b.tanggal}\nJam: ${b.jamMulai} - ${b.jamSelesai}\nStatus: ${b.status}'),
-                      trailing: b.status == 'pending'
-                        ? Icon(Icons.timelapse, color: Colors.orange)
-                        : Icon(Icons.check_circle, color: Colors.green),
-                    ),
-                  )).toList(),
+                final transaksi = snapshot.data!;
+                // Ambil data lapangan dari futureLapangan
+                return FutureBuilder<List<Lapangan>>(
+                  future: futureLapangan,
+                  builder: (context, lapanganSnapshot) {
+                    if (lapanganSnapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (lapanganSnapshot.hasError || !lapanganSnapshot.hasData) {
+                      // Fallback ke lapanganId jika gagal
+                      return Column(
+                        children: transaksi.map((b) => Container(
+                          margin: EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF43CEA2).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            leading: Icon(Icons.receipt_long, color: Color(0xFF185A9D)),
+                            title: Text('Lapangan: ${b.lapanganId}', style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text('Tanggal: ${b.tanggal}\nJam: ${b.jamMulai} - ${b.jamSelesai}\nStatus: ${b.status}\nTotal: Rp${b.totalHarga}'),
+                            trailing: b.status == 'pending'
+                              ? Icon(Icons.timelapse, color: Colors.orange)
+                              : Icon(Icons.check_circle, color: Colors.green),
+                          ),
+                        )).toList(),
+                      );
+                    }
+                    final lapanganList = lapanganSnapshot.data!;
+                    return Column(
+                      children: transaksi.map((b) {
+                        final lapangan = lapanganList.firstWhere(
+                          (l) => l.id == b.lapanganId,
+                          orElse: () => Lapangan(id: b.lapanganId, nama: 'Lapangan ${b.lapanganId}', jenis: '', harga: 0, tipe: '', aktif: 1),
+                        );
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF43CEA2).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            leading: Icon(Icons.receipt_long, color: Color(0xFF185A9D)),
+                            title: Text('Lapangan: ${lapangan.nama}', style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text('Tanggal: ${b.tanggal}\nJam: ${b.jamMulai} - ${b.jamSelesai}\nStatus: ${b.status}\nTotal: Rp${b.totalHarga}'),
+                            trailing: b.status == 'pending'
+                              ? Icon(Icons.timelapse, color: Colors.orange)
+                              : Icon(Icons.check_circle, color: Colors.green),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
                 );
               },
             ),
