@@ -12,6 +12,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfController = TextEditingController();
@@ -21,9 +22,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     setState(() { _loading = true; _error = null; });
     final response = await http.post(
-      Uri.parse(' $baseUrl/register'),
+      Uri.parse('$baseUrl/register'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
+        'name': _nameController.text,
         'email': _emailController.text,
         'password': _passwordController.text,
         'password_confirmation': _passwordConfController.text,
@@ -44,20 +46,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Color(0xFFE0F7FA),
       body: Center(
         child: SingleChildScrollView(
-          child: Card(
-            margin: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.all(28.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Image.asset(
+                  'assets/logo.png',
+                  height: 90,
+                ),
+              ),
+              Card(
+                margin: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                elevation: 8,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                child: Padding(
+                  padding: const EdgeInsets.all(28.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
                     Text('Register', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF185A9D)), textAlign: TextAlign.center),
                     SizedBox(height: 32),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Nama',
+                        prefixIcon: Icon(Icons.person_2, color: Color(0xFF185A9D)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      validator: (v) => v == null || v.isEmpty ? 'Nama wajib diisi' : null,
+                    ),
+                    SizedBox(height: 20),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -112,9 +134,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Text('Sudah punya akun? Login', style: TextStyle(color: Color(0xFF185A9D), fontWeight: FontWeight.bold)),
                     ),
                   ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+            ],
           ),
         ),
       ),

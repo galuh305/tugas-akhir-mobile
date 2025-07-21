@@ -46,20 +46,30 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Color(0xFFE0F7FA),
       body: Center(
         child: SingleChildScrollView(
-          child: Card(
-            margin: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.all(28.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text('Login', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF185A9D)), textAlign: TextAlign.center),
-                    SizedBox(height: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Image.asset(
+                  'assets/logo.png',
+                  height: 160,
+                ),
+              ),
+              Card(
+                margin: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                elevation: 8,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                child: Padding(
+                  padding: const EdgeInsets.all(28.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text('Login', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF185A9D)), textAlign: TextAlign.center),
+                        SizedBox(height: 32),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -103,9 +113,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text('Belum punya akun? Daftar', style: TextStyle(color: Color(0xFF185A9D), fontWeight: FontWeight.bold)),
                     ),
                   ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

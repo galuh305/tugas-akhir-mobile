@@ -1,4 +1,4 @@
-name: frontend
+name: hisport
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -55,6 +55,11 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+# Konfigurasi untuk flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -66,6 +71,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/qr_dana.png
+    - assets/logo.png
+    - assets/app_icon.png
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
